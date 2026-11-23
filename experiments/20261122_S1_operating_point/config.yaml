@@ -1,0 +1,11 @@
+# Study S1_operating_point. POST-TEST (validation only). Written 2026-11-21 23:45 CET before running.
+question: "Do a lower detector confidence and a looser NMS box more of the missed on-scaffold people without flooding false alarms?"
+motivation: "Error analysis of the 27 people D1_960 misses (K1 notes): they are not tiny (median 11% of image height) but in crowded groups, behind scaffold tubes, low contrast. yolo11m finds 2 of 27 at conf 0.5, 11 at 0.25, 14 at 0.1: low-confidence detections exist."
+detectors: [D0 (yolo11n 512), D1_960]
+arms:
+  - {name: D0, change: "baseline: conf 0.25, NMS iou 0.7"}
+  - {name: S_D0_c10, change: "D0, conf 0.10, NMS iou 0.7"}
+  - {name: S_D0_c10_n8, change: "D0, conf 0.10, NMS iou 0.8"}
+  - {name: S_960_c10, change: "D1_960, conf 0.10, NMS iou 0.7"}
+  - {name: S_960_c10_n8, change: "D1_960, conf 0.10, NMS iou 0.8"}
+decision: "Replace D0 only if recall at val FA 1.5% (labeled not_on) gains >= 0.05 with paired CI > 0 AND spurious detections above the cutoff (unlabeled boxes the FA rule does not see; mean of 5 draws) rise by <= 5 vs D0 (D0: 7-10). Lower confidence adds unlabeled boxes, so the second condition guards against hiding false alarms."

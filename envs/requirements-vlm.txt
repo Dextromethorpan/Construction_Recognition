@@ -1,0 +1,7 @@
+# .venv-vlm: Qwen2.5-VL inference on Apple Silicon with MLX (runs locally, 16 GB RAM -> use a 3B/7B 4-bit model).
+# Candidate pins; after install, lock with:  .venv-vlm/bin/pip freeze > envs/requirements-vlm.lock.txt
+mlx
+mlx-vlm
+pillow
+jsonschema
+pyyaml

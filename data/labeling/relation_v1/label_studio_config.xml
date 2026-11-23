@@ -1,0 +1,88 @@
+<View>
+  <Header value="$hint"/>
+  <Image name="image" value="$image" zoom="true" zoomControl="true" rotateControl="false"/>
+
+  <!-- Boxes. Pre-annotations from the source datasets are editable: fix, delete or add. -->
+  <RectangleLabels name="box" toName="image" strokeWidth="2">
+    <Label value="person" background="#e6194b"/>
+    <Label value="helmet" background="#ffe119"/>
+    <Label value="head" background="#f58231"/>
+    <Label value="harness" background="#911eb4"/>
+    <Label value="scaffold_structure" background="#4363d8"/>
+    <Label value="ladder" background="#42d4f4"/>
+    <Label value="fence" background="#bfef45"/>
+    <Label value="rebar" background="#469990"/>
+    <Label value="formwork" background="#9A6324"/>
+  </RectangleLabels>
+
+  <!-- Draw the walkable platform level(s) as polygons. One polygon per platform level. -->
+  <PolygonLabels name="platform" toName="image" strokeWidth="2" pointSize="small" opacity="0.3">
+    <Label value="scaffold_platform" background="#3cb44b"/>
+  </PolygonLabels>
+
+  <!-- Rich (D) only: ankles and hips of each person. -->
+  <KeyPointLabels name="kp" toName="image" smart="false">
+    <Label value="left_ankle" background="#000075"/>
+    <Label value="right_ankle" background="#808000"/>
+    <Label value="left_hip" background="#800000"/>
+    <Label value="right_hip" background="#aaffc3"/>
+  </KeyPointLabels>
+
+  <!-- Link person -> platform with a relation (select person, then platform, press R). -->
+  <Relations>
+    <Relation value="stands_on"/>
+    <Relation value="climbing"/>
+  </Relations>
+
+  <!-- Per-person fields: select a person box to see them. -->
+  <View visibleWhen="region-selected" whenTagName="box" whenLabelValue="person">
+    <Header value="Person: support (required, scheme C is derived from it)"/>
+    <Choices name="support" toName="image" perRegion="true" required="true" choice="single-radio" showInLine="true">
+      <Choice value="stands_on"/><Choice value="climbing"/><Choice value="none"/><Choice value="unclear"/>
+    </Choices>
+    <Header value="Proximity to the scaffold (optional, multi)"/>
+    <Choices name="proximity" toName="image" perRegion="true" choice="multiple" showInLine="true">
+      <Choice value="in_front_of"/><Choice value="behind"/><Choice value="under"/><Choice value="next_to"/>
+    </Choices>
+    <Header value="Rich (D) fields: only when the header says RICH"/>
+    <Choices name="helmet_state" toName="image" perRegion="true" showInLine="true">
+      <Choice value="helmet:worn"/><Choice value="helmet:not_worn"/><Choice value="helmet:held"/><Choice value="helmet:not_visible"/>
+    </Choices>
+    <Choices name="harness_state" toName="image" perRegion="true" showInLine="true">
+      <Choice value="harness:worn"/><Choice value="harness:not_worn"/><Choice value="harness:not_visible"/>
+    </Choices>
+    <Choices name="tied_off" toName="image" perRegion="true" showInLine="true">
+      <Choice value="tied:yes"/><Choice value="tied:no"/><Choice value="tied:not_visible"/>
+    </Choices>
+    <Choices name="height_band" toName="image" perRegion="true" showInLine="true">
+      <Choice value="h:ground"/><Choice value="h:low"/><Choice value="h:mid"/><Choice value="h:top"/><Choice value="h:unknown"/>
+    </Choices>
+    <Choices name="posture" toName="image" perRegion="true" showInLine="true">
+      <Choice value="standing"/><Choice value="climbing_posture"/><Choice value="kneeling"/><Choice value="sitting"/><Choice value="leaning"/>
+    </Choices>
+    <Choices name="visibility" toName="image" perRegion="true" showInLine="true">
+      <Choice value="vis:full"/><Choice value="vis:partial"/><Choice value="vis:feet_hidden"/>
+    </Choices>
+    <Choices name="feet_on" toName="image" perRegion="true" showInLine="true">
+      <Choice value="feet:platform"/><Choice value="feet:ground"/><Choice value="feet:ladder"/><Choice value="feet:not_visible"/>
+    </Choices>
+  </View>
+
+  <!-- Per-image fields (rich D only). -->
+  <Header value="Image (RICH only)"/>
+  <Choices name="viewpoint" toName="image" showInLine="true">
+    <Choice value="view:ground"/><Choice value="view:elevated"/><Choice value="view:aerial"/>
+  </Choices>
+  <Choices name="distance" toName="image" showInLine="true">
+    <Choice value="dist:near"/><Choice value="dist:mid"/><Choice value="dist:far"/>
+  </Choices>
+  <Choices name="lighting" toName="image" showInLine="true">
+    <Choice value="light:day"/><Choice value="light:low"/><Choice value="light:night"/><Choice value="light:backlit"/>
+  </Choices>
+  <Choices name="occlusion" toName="image" showInLine="true">
+    <Choice value="occ:none"/><Choice value="occ:partial"/><Choice value="occ:heavy"/>
+  </Choices>
+  <Choices name="image_flag" toName="image" showInLine="true">
+    <Choice value="skip:no_person_no_scaffold"/><Choice value="skip:bad_image"/>
+  </Choices>
+</View>

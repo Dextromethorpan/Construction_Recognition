@@ -1,0 +1,16 @@
+# Study H1_harness_crop (stage 2, classifier). Written 2026-11-21 ~16:30 CET BEFORE any run of this study.
+study: "H1_harness_crop"
+decision_rule: 08_controlled/decision_rule.md      # §5 bar applied to this study's primary measure
+question: "Does a torso crop beat the current C0 crop as input to the harness-worn classifier?"
+hypothesis: "Harness straps sit on the chest/shoulders; C0 (box 2x wide, 1.5x tall, squashed to 224) spends most pixels on background. A torso crop (box 1.2x wide, rows 15%-75% of the box, letterboxed) should raise harness balanced accuracy by >= 0.05."
+note: "Measured on labeled boxes (conditional), so it does not depend on the detector study D1_detector. Harness kappa v2 = 0.66 (>= 0.6, allowed as a target, rule §6)."
+data: {split_version: v2, label_version: v2, series: real_only, labels: "frozen_v2 pass 1, harness_state worn / not_worn (not_visible, unclear dropped)"}
+model: "same as judge.py: class-balanced L2 logistic regression (l2 1e-3, LBFGS 300), standardised, yolo11n-cls frozen encoder 256-d + 6 geometry numbers; cutoff 0.5"
+repeats: {seeds: [0, 1, 2, 3, 4], train_fraction_per_draw: 0.8, grouped_by: image}
+primary: "harness balanced accuracy on val_v2 + cs10k_dev labeled people, mean over 5 draws"
+also: [harness AP, n worn / not_worn, helmet balanced accuracy for the same crops (info)]
+decision: "H1 replaces H0 only if mean diff >= 0.05 and paired image-bootstrap 95% CI (2000 resamples, same resample for all draws) excludes 0; else keep H0 (simpler, already computed)."
+arms:
+  - {name: H0, change: "none (C0 crop features, as used today for helmet/harness)"}
+  - {name: H1, change: "torso crop: centre x +- 0.6 w, y from top + 0.15 h to top + 0.75 h, letterboxed 224 + same 6 numbers"}
+  - {name: H2, change: "info only: C0 + torso embeddings concatenated"}

@@ -1,0 +1,10 @@
+# Study F1_feet_crop. POST-TEST (validation only). Written 2026-11-21 23:55 CET before running.
+question: "Does adding a crop of the feet/support region to the C1 judge help separate 'on scaffold' from 'on deck / rebar next to a scaffold'?"
+motivation: "V3_confirm: on scaffold-heavy photos the judge's AP among boxed people is 0.66-0.71; errors are people on decks/formwork/rebar beside scaffolds."
+arms:
+  - {name: C1, change: "baseline judge (C1 crop + 6 numbers)"}
+  - {name: C1F, change: "C1 + feet crop embedding: box width 2x centred, rows from 0.7 h to 1.3 h of the box (feet and what is under them), letterboxed 224, frozen yolo11n-cls 256-d"}
+recipe: "logistic regression l2 1e-3 balanced, 5 draws of 80% train_v2, detector D0 fixed, threshold at FA 1.5% on the evaluated set's not_on people"
+primary_1: "old selection set (val_v2 + cs10k_dev), end-to-end recall at FA 1.5%, compare.py"
+primary_2: "confirmation on val_extra (120 new photos): end-to-end recall at FA 1.5% AND AP among boxed people (because 1.5% = 3 false alarms there)"
+decision: "Adopt C1F only if BOTH sets show >= +0.05 with paired image-bootstrap CI > 0 on the end-to-end recall at FA 1.5% (val_extra: also report FA 5% and boxed-AP). Otherwise keep C1."

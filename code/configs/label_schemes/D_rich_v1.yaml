@@ -1,0 +1,25 @@
+# Scheme D = C made richer, labeled on the test sets + ~200 training images (queue column rich_D=1).
+scheme: D_rich_v1
+version: 1
+extends: C_relation_v1
+per_person:
+  support: [stands_on, climbing, none, unclear]                 # exactly one
+  proximity: [in_front_of, behind, under, next_to]              # optional, multi-label
+  height_band: [ground, low, mid, top, unknown]
+  posture: [standing, climbing, kneeling, sitting, leaning]
+  helmet: [worn, not_worn, held, not_visible]
+  harness: [worn, not_worn, not_visible]
+  tied_off: [yes, no, not_visible]
+  visibility: [full, partial, feet_hidden]
+  feet_on: [platform, ground, ladder, not_visible]
+keypoints: {names: [left_ankle, right_ankle, left_hip, right_hip], visibility: "COCO 0=not labeled, 1=occluded, 2=visible"}
+lookalike_classes: [ladder, fence, rebar, formwork, scaffold_structure]
+per_image:
+  source: auto
+  site_id: auto (group_id)
+  viewpoint: [ground, elevated, aerial]
+  distance: [near, mid, far]
+  n_persons: auto (count of person boxes)
+  lighting: [day, low_light, night, backlit]
+  occlusion: [none, partial, heavy]
+relation_storage: "person_id, predicate, platform_id"

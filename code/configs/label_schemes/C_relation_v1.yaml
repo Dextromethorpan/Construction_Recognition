@@ -1,0 +1,19 @@
+# Scheme C = B + a per-person relation, from HUMAN labels only (labels/relations/v1/).
+# Rule: "on scaffold" = both feet on a scaffold platform above ground level.
+#       A ladder counts only if it is attached to the scaffold.
+# Never filled from geometry, a detector or a VLM (those are compared AGAINST C).
+scheme: C_relation_v1
+version: 1
+extends: B_objects_platform_v1
+covers: images in labeling_queue/relation_v1/queue.csv that have a finished human annotation
+relation:
+  subject: person            # each person instance gets an id
+  object: scaffold_platform  # platform instance id, or null
+  values: [on, next_to, unclear]
+  derived_from_support:      # C is derived from the D 'support' field so both stay consistent
+    stands_on: on
+    climbing: on             # climbing an attached ladder/frame counts as on (see GUIDELINES)
+    none: next_to
+    unclear: unclear
+  default_when_doubt: unclear
+agreement: {double_labeled_share: 0.15, metric: cohen_kappa, adjudication: disagreements -> unclear unless resolved}

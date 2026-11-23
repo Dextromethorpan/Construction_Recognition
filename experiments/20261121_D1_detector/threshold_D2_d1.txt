@@ -1,0 +1,2 @@
+FA budget 1.5%: threshold 0.7838 | recall 0.492 (58 of 118) 95% CI [0.375, 0.623] | false alarms 13 of 878
+FA budget 5.0%: threshold 0.0512 | recall 0.610 (72 of 118) 95% CI [0.494, 0.727] | false alarms 43 of 878

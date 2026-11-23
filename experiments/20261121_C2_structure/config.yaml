@@ -1,0 +1,64 @@
+# Study C2_structure: support geometry from scaffold_structure boxes. Written 2026-11-21 BEFORE the first run.
+# Same recipe as 20261121_context_C0_C3/config.yaml except the arms and the geometry source (Luciano, decision card 12:33 CET).
+# Every arm uses this file; only `arms` differs. Its hash goes on every RUNLOG row.
+study: "C2_structure"
+created: "2026-11-21"
+decision_rule: 08_controlled/decision_rule.md      # fixed; do not edit after the first run
+question: "Does support geometry from predicted scaffold_structure boxes added to the C1 judge (C1G) beat C1 on end-to-end on-scaffold recall at val FA 1.5%? (C0G vs C0 reported for information only)"
+
+data:
+  split_version: v2                     # train_v2 fit; val_v2 + cs10k_dev select; test_v1 NOT used in this study run
+  label_version: v2                     # GenIA-data/labels/relations/v2/frozen_v2/people_v2.csv (pass 1 only)
+  label_policy: {unclear: drop, unannotated: drop, harness_from: per_person_field, labels_from: frozen_v2_pass1,
+                 on_scaffold: derived_from_support_surface, claude_only_tasks: kept_and_flagged}
+  series: real_only                     # synthetic ESCO images (data.synthetic = 1) dropped from fit AND selection
+  extra_negatives: none
+
+detector:                               # fixed for the whole study; detections cached once
+  weights: "~/GenIA-data/runs/ablation_v2b/V2_harness_field/weights/best.pt"   # step 1b base + V2 fine-tune
+  conf: 0.25
+  imgsz: 512                            # the size this detector was trained and evaluated at (template default 640 not used)
+  person_class: 0
+  platform_class: 4                     # not used (emits no boxes at conf 0.25; study context_C0_C3 r00021)
+  structure_class: 5                    # scaffold_structure boxes, conf >= 0.25, same source for train and val
+  match_iou: 0.5                        # detection <-> labeled person, greedy best IoU first
+  cache: "GenIA-data/runs/controlled/C2_structure/detections.json"           # byte copy of the context_C0_C3 cache (same detector, same settings)
+
+judge:
+  input: C1                             # overridden by arm
+  inputs:
+    C0: "crop as today: box widened 2x, heightened 1.5x, resized to 224 (aspect not kept) + 6 box-geometry numbers"
+    C1: "bigger crop: 3x width, 2x height, letterboxed to square (aspect kept), 224 + same 6 numbers"
+    C1G: "C1 + 7 structure-geometry numbers (judge.structure_geo): foot point = box bottom-centre; feet inside a structure box, distance/h to nearest (cap 5), foot height within the structure's vertical extent (0 bottom, 1 top, -1 none spanning the foot x), overlap of lower 20% of person box with a structure, n structures/10, max conf, any"
+    C0G: "C0 + the same 7 numbers"
+  encoder: yolo11n-cls.pt (frozen)
+  model: logistic_regression            # torch LBFGS 300 iters, standardised features
+  l2: 1.0e-3
+  class_weight: balanced
+  output: probability
+  train_boxes: labeled                  # fit on labeled person boxes; scored on detections (end-to-end) and labeled boxes (conditional)
+  feature_cache: "GenIA-data/runs/controlled/C2_structure/features.npz"
+
+repeats:
+  seeds: [0, 1, 2, 3, 4]
+  subset_draws_grouped_by: image        # draw d: random 80% of train_v2 images (seed d); same draws for every arm
+  train_fraction_per_draw: 0.8
+
+threshold:
+  rule: fa_on_val                       # lowest cutoff with FA <= budget on not_on people of val_v2 + cs10k_dev
+  budgets: [0.015, 0.05]                # primary first
+
+metrics:
+  primary: recall_at_fa_0.015_end_to_end
+  also: [recall_at_fa_0.05, conditional_ap_true_boxes, helmet_bal_acc, harness_bal_acc, counts]
+  bootstrap: {resamples: 2000, by: image, rethreshold_inside: true}
+  decision_stat: "mean over the 5 draws of the paired recall difference; bootstrap resamples images once and applies to all 5 draws (compare.py)"
+  control: [C1_person_coverage, C2_kappa, C3_class_balance, C4_learning_curve, C5_error_split]
+
+arms:                                   # the one thing the study varies
+  - {name: C1, change: "none (baseline: winner of context_C0_C3, RUNLOG r00022)"}
+  - {name: C1G, change: "judge.input = C1G (primary comparison: C1G vs C1)"}
+  - {name: C0, change: "judge.input = C0 (information only)"}
+  - {name: C0G, change: "judge.input = C0G (information only: C0G vs C0)"}
+
+compute: {device: mps, where: "local Mac, lid open"}

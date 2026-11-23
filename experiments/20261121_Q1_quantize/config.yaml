@@ -1,0 +1,12 @@
+# Study Q1_quantize (stage 3). Written 2026-11-21 ~17:20 CET BEFORE any accuracy run of this study.
+study: "Q1_quantize"
+question: "How much speed / size do FP16 and INT8 exports of the chosen detector buy, and what do they cost in end-to-end on-scaffold recall on val?"
+hypothesis: "FP16 is free (drop < 0.01). INT8 weight-only (CoreML) costs < 0.02; full INT8 (ONNX static QDQ) costs more on small people (0.02-0.05) but is ~2x faster on CPU than ONNX FP32."
+model_under_test: "the stage-1 winner (D1_detector decision), same imgsz; judge C1 (fp32, unchanged) and the H0 helmet/harness heads"
+variants: [pt_fp32 (MPS reference), coreml_fp16, coreml_int8 (8-bit weights), onnx_fp32 (CPU), onnx_int8 (ORT static QDQ per-channel, detect-head decode ops kept fp32)]
+calibration: "200 train_v2 images (seeded shuffle). Never val or test."
+measures:
+  accuracy: "end-to-end recall at val FA 1.5% (5 judge draws, same as D1_detector), on-scaffold people boxed of 118, spurious dets"
+  speed: "median and p90 ms/image, batch 1, 100 val_v2 images after 10 warm-up, ultralytics predict (pre + model + NMS), M5 Mac"
+  size: "MB on disk"
+decision: "Recommended deployment variant = the smallest model whose mean recall drop vs pt_fp32 is <= 0.02 AND on-scaffold boxed drop <= 2 people. A variant beyond that budget is reported but not recommended. No CI requirement (this is an acceptability check, not a replacement study)."

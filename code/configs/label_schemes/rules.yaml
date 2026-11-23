@@ -1,0 +1,18 @@
+# Violations are COMPUTED from facts (labels describe what is there, not violations).
+version: 1
+rules:
+  - id: no_helmet
+    when: "helmet == 'not_worn'"
+    severity: high
+  - id: no_harness_on_scaffold
+    when: "support in ['stands_on', 'climbing'] and harness == 'not_worn'"
+    severity: high
+  - id: not_tied_off_on_scaffold
+    when: "support in ['stands_on', 'climbing'] and harness == 'worn' and tied_off == 'no'"
+    severity: medium
+  - id: needs_review
+    when: "'unclear' in [support, helmet, harness] or helmet == 'not_visible' or harness == 'not_visible'"
+    severity: info
+cs10k_alignment:   # how our rules map onto ConstructionSite-10k's violation labels for test_external
+  rule_1_violation: no_helmet (CS10k rule 1 is broader: all basic PPE)
+  rule_2_violation: no_harness_on_scaffold (CS10k rule 2: >= 3 m without edge protection, any structure)

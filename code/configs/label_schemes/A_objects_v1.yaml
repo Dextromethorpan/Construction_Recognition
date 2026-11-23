@@ -1,0 +1,46 @@
+# Scheme A - objects only. Mapping over ORIGINAL classes (interim/<src>/annotations.coco.json).
+# Missing vs absent: a class is used as a negative ONLY in sources that label it exhaustively.
+# For every other image the class goes into the LVIS-style field `not_exhaustive_category_ids`,
+# so a loss can ignore it. YOLO cannot express this; see export policy.
+scheme: A_objects_v1
+version: 1
+classes: [person, helmet, head, harness]
+class_notes:
+  helmet: box around a head WEARING a hard hat (SHWD 'hat', Hard Hat Workers 'helmet')
+  head: box around a head WITHOUT a hard hat (SHWD 'person', Hard Hat 'head', harness_main 'No helmet')
+excluded_sources: [cs10k]   # test_external: scored with its own rules, never mapped into training schemes
+on_missing: not_exhaustive   # not_exhaustive (default) | exclude_image (strict export)
+sources:
+  hardhat_wkrs:
+    map: {helmet: helmet, head: head, person: person}
+    exhaustive: [helmet, head]          # 'person' is sparse in this set
+  shwd:
+    map: {hat: helmet, person: head}   # 'dog' (3 boxes) is dropped
+    exhaustive: [helmet, head]
+  rf_harness_main:
+    map: {person: person, helmet: helmet, "No helmet": head, harness: harness}
+    exhaustive: [person, helmet, head, harness]   # 'No harness' etc. are person-region negatives, not mapped
+  rf_harness_mks:
+    map: {human: person, safety-harness: harness}
+    exhaustive: [harness]               # only 652 humans on ~3k images: person is NOT exhaustive
+  rf_harness_fypcv:
+    map: {human: person, safety-harness: harness}
+    exhaustive: [person, harness]
+  rf_scaffold_platform:
+    map: {}
+    exhaustive: []
+  rf_scaffold_climb: &korean_mobile
+    map: {worker_with_helmet: person, worker_without_helmet: person,
+          worker_with_helmet_climbing: person, worker_without_helmet_climbing: person}
+    exhaustive: [person]                # helmet state is a person attribute here, no head boxes
+  rf_scaffold_archikhu: *korean_mobile
+  rf_scaffold_mobile: *korean_mobile
+  rf_scaffold_sparks:
+    map: {}
+    exhaustive: []
+  rf_scaffold_esco:
+    map: {worker: person}
+    exhaustive: [person]
+  rf_scaffold_hook:
+    map: {worker: person, hardhat: helmet}
+    exhaustive: [person]

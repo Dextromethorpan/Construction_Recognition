@@ -1,0 +1,44 @@
+# Scheme D v2 = C v2 + all per-person and per-image fields. Labeled on EVERY v2 task (no RICH subset in v2).
+# v1 (D_rich_v1.yaml) is frozen. Values are stored in Label Studio with the prefixes shown (e.g. "feet:ground").
+scheme: D_rich_v2
+version: 2
+extends: C_relation_v2
+states: [value, unclear_or_not_visible, unannotated]   # an unset field is 'unannotated', never 'no'
+per_person:
+  support_surface: {values: [scaffold_platform, scaffold_frame_or_attached_ladder, ground, other_elevated, unclear], required: always}
+  feet_on:         {values: [platform, frame_or_ladder, ground, other_surface, not_visible], prefix: "feet:", required: always}
+  feet_visible:    {values: [both, one, none], prefix: "fv:", required: always}
+  proximity:       {values: [in_front_of, behind, under, next_to, far, no_scaffold_in_image], prefix: "prox:",
+                    required: "if support_surface in [ground, other_elevated, unclear]", multi: false}
+  helmet_state:    {values: [worn, not_worn, held, not_visible], prefix: "helmet:", required: always}
+  harness_state:   {values: [worn, not_worn, not_visible], prefix: "harness:", required: always,
+                    rule_v2: "not_worn only if shoulders AND chest visible with no straps; otherwise not_visible"}
+  anchor_visible:  {values: [yes, no], prefix: "anchor:", required: "if harness_state == worn", training_target: false}
+  height_band:     {values: [ground, low, mid, top, unknown], prefix: "h:", required: optional}
+  posture:         {values: [standing, climbing_posture, kneeling, sitting, leaning], required: optional}
+parked_from_v1: {tied_off: "replaced by anchor_visible (kappa ~0, 1 positive)", visibility: "replaced by feet_visible",
+                 hips: "dropped"}
+keypoints: {names: [left_ankle, right_ankle], occluded_labels: [left_ankle_occluded, right_ankle_occluded],
+            visibility: "COCO 2 = visible label, 1 = *_occluded label, 0 = not placed",
+            prefill: "COCO pose model (02_labeling/relation_v2/prefill_pose.py), checked by the labeler"}
+relations: {on_platform: "person -> scaffold_platform polygon", on_frame_or_ladder: optional}
+per_image:
+  all_people_boxed: {values: [yes, no], prefix: "boxed:", required: always}
+  ignore_region:    {type: rectangle, required: optional}
+  scaffold_platform: {type: polygon, required: "every image with a scaffold, incl. synthetic"}
+  viewpoint: [ground, elevated, aerial]
+  distance: [near, mid, far]
+  lighting: [day, low_light, night, backlit]
+  occlusion: [none, partial, heavy]
+provenance_task_data:   # set by build_queue.py, not labeled
+  selected_by: [random, active, contrast, legacy_v1]
+  contrast_group: "id or empty"
+  split_v2: [train_v2, val_v2, cs10k_dev]
+  task_kind: [relabel_v1, new]
+  site_or_sequence_id: "group_id from interim COCO"
+  pass: [1, 2]
+consistency_checks:   # flagged for review by parse_v2.py, never auto-fixed
+  - "support_surface on-scaffold but feet_on == ground (or the reverse)"
+  - "feet_visible == none but feet_on != not_visible"
+  - "support_surface in [ground, other_elevated, unclear] and proximity unannotated"
+  - "relabel_v1 task: backward_map(support_surface) != frozen v1 support"

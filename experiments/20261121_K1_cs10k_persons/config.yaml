@@ -1,0 +1,15 @@
+# Study K1_cs10k_persons. POST-TEST round (test_v1 used, r00097): validation only. Luciano approved using CS10k train
+# images for this round (2026-11-21 20:47 CET, option A). Written BEFORE any run of this study.
+study: "K1_cs10k_persons"
+phase: post_test_validation_only
+decision_rule: 08_controlled/decision_rule.md
+question: "Does adding machine-labeled person boxes on CS10k photos to the detector fine-tune (at 960 px) beat D0?"
+hypothesis: "D0 boxes 83 of 118 selection on-scaffold people; misses are concentrated in cs10k_dev (small people, MOCS style). 2,000 CS10k images with yolo11m person boxes should raise boxing on cs10k_dev and end-to-end recall by >= 0.05 vs D0."
+pool: "cs10k images NOT in test_v1 or cs10k_dev, NOT in a dedup cluster with them, pHash Hamming > 10 to every test_v1 and cs10k_dev image (reports/phash.csv); 2,000 drawn with seed 0"
+pseudo_labels: "yolo11m.pt (COCO) class person, imgsz 1280, conf >= 0.5; person class only (other classes unlabeled on these images: the pipeline uses only the person class)"
+training: "fine-tune from base2_persons_n512_e15 on V2_harness_field train + the 2,000 CS10k images; finetune.py recipe (10 ep, AdamW 1e-3, seed 0) at imgsz 960 batch 8; val = V2_harness_field val (as before)"
+arms:
+  - {name: D0, change: "baseline (D1_detector D0 scores)"}
+  - {name: K1, change: "960 px fine-tune with CS10k pseudo persons; inference 960"}
+info: "K1 vs D1_960 isolates the CS10k data effect (same resolution)"
+judge: C1 (logistic regression, same 5 draws)

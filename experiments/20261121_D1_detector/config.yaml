@@ -1,0 +1,65 @@
+# Study D1_detector: which detector feeds the C1 judge. Written 2026-11-21 ~14:20 CET BEFORE any run of this study.
+# Recipe = 20261121_C2_structure/config.yaml (judge C1, l2 1e-3, 5 draws of 80% train_v2, threshold at val FA 1.5%),
+# except the detector, which is the one thing the arms vary. Its hash goes on every RUNLOG row.
+study: "D1_detector"
+created: "2026-11-21"
+decision_rule: 08_controlled/decision_rule.md      # fixed; unchanged
+question: "Does a higher-resolution fine-tune (D1, imgsz 1280) or a bigger model (D2, yolo11s) beat the current yolo11n-512 detector (D0) on end-to-end on-scaffold recall at val FA 1.5% with the C1 judge?"
+hypothesis: "35 of 118 selection on-scaffold people get no box; most are small (CS10k). More input pixels (D1) should box more of them (expect >= +0.05). A bigger model at 512 (D2) helps less on small people (expect < +0.05)."
+
+data:
+  split_version: v2
+  label_version: v2
+  label_policy: {unclear: drop, unannotated: drop, harness_from: per_person_field, labels_from: frozen_v2_pass1,
+                 on_scaffold: derived_from_support_surface, claude_only_tasks: kept_and_flagged}
+  series: real_only
+  extra_negatives: none
+
+detector:                               # baseline D0; arms override weights / imgsz
+  weights: "~/GenIA-data/runs/ablation_v2b/V2_harness_field/weights/best.pt"
+  conf: 0.25                            # FIXED for all arms (lowering it would add unlabeled spurious boxes the FA rule does not see)
+  imgsz: 512
+  person_class: 0
+  platform_class: 4
+  structure_class: 5
+  match_iou: 0.5
+  cache: "GenIA-data/runs/controlled/D1_detector/<arm>/detections.json"
+
+detector_training:                      # same data + recipe for every trained arm (07_ablation/run_step1b.sh)
+  base: "train_detector.py on build/B_persons_v1 (15 ep, seed 0, patience 8, cos_lr, close_mosaic 5, batch 16)"
+  finetune: "finetune.py recipe on build/ablation_v2/V2_harness_field (10 ep, AdamW lr0 1e-3, warmup 1, close_mosaic 3, cos_lr, seed 0)"
+  seeds: "one training seed (0) per detector arm: time budget. Variation across draws is judge-only."
+
+judge:
+  input: C1
+  encoder: yolo11n-cls.pt (frozen)
+  model: logistic_regression
+  l2: 1.0e-3
+  class_weight: balanced
+  output: probability
+  train_boxes: labeled
+
+repeats:
+  seeds: [0, 1, 2, 3, 4]
+  subset_draws_grouped_by: image
+  train_fraction_per_draw: 0.8
+
+threshold:
+  rule: fa_on_val
+  budgets: [0.015, 0.05]
+
+metrics:
+  primary: recall_at_fa_0.015_end_to_end
+  also: [recall_at_fa_0.05, on_scaffold_people_boxed (of 118), spurious detections scored above the cutoff, detector ms/image on MPS]
+  decision_stat: "compare.py, mean over 5 draws of paired diff, 2000 image resamples"
+  multiple_arms: "D1 and D2 each compared to D0 under §5. If both pass, the larger mean gain wins; tie -> simpler (D1_960, same model size)."
+
+arms:
+  - {name: D0, change: "none (baseline: V2_harness_field yolo11n, imgsz 512)"}
+  - {name: D1, change: "ABANDONED before scoring: 1280 batch 8 swapped (10.4 GB on a 16 GB Mac, 63 of 271 iterations in 75 min); replaced by D1_960"}
+  - {name: D1_960, change: "fine-tune stage re-run at imgsz 960 (batch 8) from the same base2 checkpoint; inference at 960. Amended 2026-11-21 15:25 CET, before any scoring run"}
+  - {name: D2, change: "yolo11s: base re-trained at 512 with the base recipe, then the same 512 fine-tune; inference at 512"}
+  - {name: D0i1280, change: "info only: D0 weights, inference at 1280, no retraining"}
+next_study_if_time: "D2_tiling: winner + tiled inference (2x2 tiles, 20% overlap, + full image, NMS 0.5), one arm vs winner"
+
+compute: {device: mps, where: "local Mac, lid open, caffeinate on"}

@@ -1,0 +1,9 @@
+# Study T1_threshold. POST-TEST (validation only). Written 2026-11-21 ~21:30 CET before running.
+question: "Can a more conservative cutoff rule keep the realised false-alarm rate near 1.5% on unseen photos?"
+motivation: "Test FA was 5.4% at a cutoff set for 1.5% on val (in-distribution 8.9%)."
+method: "Cross-fitting on val only: 500 random 50/50 splits of selection images (grouped). Choose the cutoff on half A, measure realised FA and recall on half B. Scores: D0 + C1 judge, 5 draws (D1_detector scores_D0_d*)."
+rules:
+  - {name: T0, rule: "point cutoff: lowest threshold with FA <= 1.5% on A (current)"}
+  - {name: T1, rule: "conservative: 90th percentile of the cutoff over 200 bootstrap resamples of A"}
+  - {name: T2, rule: "budget halved: FA <= 0.75% on A"}
+success: "a rule whose median realised FA on B is <= 1.5% AND whose 90th percentile realised FA is <= 3%, with the least recall loss. Report the recall cost honestly."

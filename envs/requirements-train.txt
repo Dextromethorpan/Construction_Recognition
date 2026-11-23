@@ -1,0 +1,8 @@
+# .venv-train: YOLO detector training on Apple Silicon (PyTorch MPS backend).
+# Candidate pins; after install, lock exact versions with:  .venv-train/bin/pip freeze > envs/requirements-train.lock.txt
+torch==2.6.0
+torchvision==0.21.0
+ultralytics==8.3.40
+pycocotools==2.0.8
+pyyaml
+pandas

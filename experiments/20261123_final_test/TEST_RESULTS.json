@@ -1,0 +1,406 @@
+{
+ "pt_fp32": {
+  "all_real": {
+   "n_on": 191,
+   "n_not_on": 790,
+   "on_boxed": 127,
+   "spurious_dets": 59,
+   "fa0.015": {
+    "recall": 0.517,
+    "recall_draws": [
+     0.518,
+     0.518,
+     0.503,
+     0.524,
+     0.524
+    ],
+    "recall_ci": [
+     0.433,
+     0.608
+    ],
+    "hits_mean": 98.8,
+    "false_alarm_rate": 0.054,
+    "spurious_above": 16.8
+   },
+   "fa0.05": {
+    "recall": 0.593,
+    "recall_draws": [
+     0.576,
+     0.597,
+     0.602,
+     0.581,
+     0.607
+    ],
+    "recall_ci": [
+     0.505,
+     0.688
+    ],
+    "hits_mean": 113.2,
+    "false_alarm_rate": 0.106,
+    "spurious_above": 22.6
+   },
+   "helmet_n": [
+    731,
+    205
+   ],
+   "helmet_bal_acc": 0.734,
+   "harness_n": [
+    88,
+    485
+   ],
+   "harness_bal_acc": 0.779
+  },
+  "test_indist": {
+   "n_on": 110,
+   "n_not_on": 159,
+   "on_boxed": 101,
+   "spurious_dets": 21,
+   "fa0.015": {
+    "recall": 0.805,
+    "recall_draws": [
+     0.8,
+     0.791,
+     0.791,
+     0.818,
+     0.827
+    ],
+    "recall_ci": [
+     0.732,
+     0.877
+    ],
+    "hits_mean": 88.6,
+    "false_alarm_rate": 0.089,
+    "spurious_above": 8.0
+   },
+   "fa0.05": {
+    "recall": 0.896,
+    "recall_draws": [
+     0.882,
+     0.9,
+     0.9,
+     0.882,
+     0.918
+    ],
+    "recall_ci": [
+     0.839,
+     0.953
+    ],
+    "hits_mean": 98.6,
+    "false_alarm_rate": 0.147,
+    "spurious_above": 10.0
+   },
+   "helmet_n": [
+    104,
+    142
+   ],
+   "helmet_bal_acc": 0.73,
+   "harness_n": [
+    62,
+    150
+   ],
+   "harness_bal_acc": 0.806
+  },
+  "test_external": {
+   "n_on": 42,
+   "n_not_on": 620,
+   "on_boxed": 20,
+   "spurious_dets": 33,
+   "fa0.015": {
+    "recall": 0.176,
+    "recall_draws": [
+     0.19,
+     0.214,
+     0.143,
+     0.167,
+     0.167
+    ],
+    "recall_ci": [
+     0.077,
+     0.303
+    ],
+    "hits_mean": 7.4,
+    "false_alarm_rate": 0.045,
+    "spurious_above": 4.8
+   },
+   "fa0.05": {
+    "recall": 0.262,
+    "recall_draws": [
+     0.214,
+     0.286,
+     0.286,
+     0.262,
+     0.262
+    ],
+    "recall_ci": [
+     0.119,
+     0.446
+    ],
+    "hits_mean": 11.0,
+    "false_alarm_rate": 0.097,
+    "spurious_above": 8.4
+   },
+   "helmet_n": [
+    595,
+    58
+   ],
+   "helmet_bal_acc": 0.667,
+   "harness_n": [
+    10,
+    333
+   ],
+   "harness_bal_acc": 0.704
+  },
+  "test_heldout": {
+   "n_on": 39,
+   "n_not_on": 11,
+   "on_boxed": 6,
+   "spurious_dets": 5,
+   "fa0.015": {
+    "recall": 0.072,
+    "recall_draws": [
+     0.077,
+     0.077,
+     0.077,
+     0.077,
+     0.051
+    ],
+    "recall_ci": [
+     0.0,
+     0.191
+    ],
+    "hits_mean": 2.8,
+    "false_alarm_rate": 0.0,
+    "spurious_above": 4.0
+   },
+   "fa0.05": {
+    "recall": 0.092,
+    "recall_draws": [
+     0.103,
+     0.077,
+     0.103,
+     0.077,
+     0.103
+    ],
+    "recall_ci": [
+     0.005,
+     0.219
+    ],
+    "hits_mean": 3.6,
+    "false_alarm_rate": 0.0,
+    "spurious_above": 4.2
+   },
+   "helmet_n": [
+    32,
+    5
+   ],
+   "helmet_bal_acc": 0.635,
+   "harness_n": [
+    16,
+    2
+   ],
+   "harness_bal_acc": 0.688
+  }
+ },
+ "coreml_int8": {
+  "all_real": {
+   "n_on": 191,
+   "n_not_on": 790,
+   "on_boxed": 129,
+   "spurious_dets": 66,
+   "fa0.015": {
+    "recall": 0.521,
+    "recall_draws": [
+     0.524,
+     0.503,
+     0.513,
+     0.529,
+     0.539
+    ],
+    "recall_ci": [
+     0.439,
+     0.609
+    ],
+    "hits_mean": 99.6,
+    "false_alarm_rate": 0.052,
+    "spurious_above": 17.6
+   },
+   "fa0.05": {
+    "recall": 0.601,
+    "recall_draws": [
+     0.597,
+     0.602,
+     0.613,
+     0.592,
+     0.602
+    ],
+    "recall_ci": [
+     0.513,
+     0.695
+    ],
+    "hits_mean": 114.8,
+    "false_alarm_rate": 0.103,
+    "spurious_above": 24.6
+   },
+   "helmet_n": [
+    731,
+    205
+   ],
+   "helmet_bal_acc": 0.734,
+   "harness_n": [
+    88,
+    485
+   ],
+   "harness_bal_acc": 0.779
+  },
+  "test_indist": {
+   "n_on": 110,
+   "n_not_on": 159,
+   "on_boxed": 102,
+   "spurious_dets": 24,
+   "fa0.015": {
+    "recall": 0.793,
+    "recall_draws": [
+     0.791,
+     0.764,
+     0.782,
+     0.8,
+     0.827
+    ],
+    "recall_ci": [
+     0.72,
+     0.866
+    ],
+    "hits_mean": 87.2,
+    "false_alarm_rate": 0.093,
+    "spurious_above": 9.2
+   },
+   "fa0.05": {
+    "recall": 0.9,
+    "recall_draws": [
+     0.9,
+     0.9,
+     0.9,
+     0.891,
+     0.909
+    ],
+    "recall_ci": [
+     0.845,
+     0.953
+    ],
+    "hits_mean": 99.0,
+    "false_alarm_rate": 0.147,
+    "spurious_above": 12.6
+   },
+   "helmet_n": [
+    104,
+    142
+   ],
+   "helmet_bal_acc": 0.73,
+   "harness_n": [
+    62,
+    150
+   ],
+   "harness_bal_acc": 0.806
+  },
+  "test_external": {
+   "n_on": 42,
+   "n_not_on": 620,
+   "on_boxed": 21,
+   "spurious_dets": 38,
+   "fa0.015": {
+    "recall": 0.229,
+    "recall_draws": [
+     0.238,
+     0.238,
+     0.214,
+     0.238,
+     0.214
+    ],
+    "recall_ci": [
+     0.097,
+     0.382
+    ],
+    "hits_mean": 9.6,
+    "false_alarm_rate": 0.043,
+    "spurious_above": 4.4
+   },
+   "fa0.05": {
+    "recall": 0.286,
+    "recall_draws": [
+     0.262,
+     0.31,
+     0.31,
+     0.286,
+     0.262
+    ],
+    "recall_ci": [
+     0.125,
+     0.473
+    ],
+    "hits_mean": 12.0,
+    "false_alarm_rate": 0.094,
+    "spurious_above": 8.0
+   },
+   "helmet_n": [
+    595,
+    58
+   ],
+   "helmet_bal_acc": 0.667,
+   "harness_n": [
+    10,
+    333
+   ],
+   "harness_bal_acc": 0.704
+  },
+  "test_heldout": {
+   "n_on": 39,
+   "n_not_on": 11,
+   "on_boxed": 6,
+   "spurious_dets": 4,
+   "fa0.015": {
+    "recall": 0.072,
+    "recall_draws": [
+     0.077,
+     0.051,
+     0.077,
+     0.077,
+     0.077
+    ],
+    "recall_ci": [
+     0.0,
+     0.196
+    ],
+    "hits_mean": 2.8,
+    "false_alarm_rate": 0.0,
+    "spurious_above": 4.0
+   },
+   "fa0.05": {
+    "recall": 0.097,
+    "recall_draws": [
+     0.103,
+     0.077,
+     0.128,
+     0.077,
+     0.103
+    ],
+    "recall_ci": [
+     0.005,
+     0.224
+    ],
+    "hits_mean": 3.8,
+    "false_alarm_rate": 0.0,
+    "spurious_above": 4.0
+   },
+   "helmet_n": [
+    32,
+    5
+   ],
+   "helmet_bal_acc": 0.635,
+   "harness_n": [
+    16,
+    2
+   ],
+   "harness_bal_acc": 0.688
+  }
+ }
+}

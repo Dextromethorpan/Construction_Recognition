@@ -1,0 +1,108 @@
+<View>
+  <!-- GenIA relation v2 (2026-11-20). Rules: GUIDELINES.md (v2.0) in this folder. v1 config is frozen. -->
+  <Header value="$hint"/>
+  <Image name="image" value="$image" zoom="true" zoomControl="true" rotateControl="false"/>
+
+  <!-- Boxes: pre-filled from the source dataset and a COCO person model. Fix, delete, add every visible person. -->
+  <RectangleLabels name="box" toName="image" strokeWidth="2">
+    <Label value="person" background="#e6194b"/>
+    <Label value="helmet" background="#ffe119"/>
+    <Label value="head" background="#f58231"/>
+    <Label value="harness" background="#911eb4"/>
+    <Label value="scaffold_structure" background="#4363d8"/>
+    <Label value="ladder" background="#42d4f4"/>
+    <Label value="fence" background="#bfef45"/>
+    <Label value="rebar" background="#469990"/>
+    <Label value="formwork" background="#9A6324"/>
+  </RectangleLabels>
+
+  <!-- Crowds or tiny people not boxed one by one: a true "ignore", neither person nor background. -->
+  <RectangleLabels name="ignore" toName="image" strokeWidth="1" opacity="0.15">
+    <Label value="ignore_region" background="#a9a9a9"/>
+  </RectangleLabels>
+
+  <!-- Walkable platform level(s): one polygon per deck level. Required on every image with a scaffold. -->
+  <PolygonLabels name="platform" toName="image" strokeWidth="2" pointSize="small" opacity="0.3">
+    <Label value="scaffold_platform" background="#3cb44b"/>
+  </PolygonLabels>
+
+  <!-- Ankles only (hips dropped in v2). Pre-filled by a COCO pose model; *_occluded = position inferred. -->
+  <KeyPointLabels name="kp" toName="image" smart="false">
+    <Label value="left_ankle" background="#000075"/>
+    <Label value="right_ankle" background="#808000"/>
+    <Label value="left_ankle_occluded" background="#7f7fbf"/>
+    <Label value="right_ankle_occluded" background="#bfbf7f"/>
+  </KeyPointLabels>
+
+  <!-- Link person -> platform polygon (select person, then platform, press R). -->
+  <Relations>
+    <Relation value="on_platform"/>
+    <Relation value="on_frame_or_ladder"/>
+  </Relations>
+
+  <!-- Per-person fields: select a person box to see them. -->
+  <View visibleWhen="region-selected" whenTagName="box" whenLabelValue="person">
+    <Header value="1. What supports the person? (required; on_scaffold is derived from this)"/>
+    <Choices name="support_surface" toName="image" perRegion="true" required="true" choice="single-radio" showInLine="true">
+      <Choice value="scaffold_platform"/>
+      <Choice value="scaffold_frame_or_attached_ladder"/>
+      <Choice value="ground"/>
+      <Choice value="other_elevated"/>
+      <Choice value="unclear"/>
+    </Choices>
+    <Header value="2. What do you SEE under the feet? (required)"/>
+    <Choices name="feet_on" toName="image" perRegion="true" required="true" choice="single-radio" showInLine="true">
+      <Choice value="feet:platform"/><Choice value="feet:frame_or_ladder"/><Choice value="feet:ground"/>
+      <Choice value="feet:other_surface"/><Choice value="feet:not_visible"/>
+    </Choices>
+    <Header value="3. Feet whose contact is visible (required)"/>
+    <Choices name="feet_visible" toName="image" perRegion="true" required="true" choice="single-radio" showInLine="true">
+      <Choice value="fv:both"/><Choice value="fv:one"/><Choice value="fv:none"/>
+    </Choices>
+    <Header value="4. Proximity to the scaffold (required if NOT on a scaffold)"/>
+    <Choices name="proximity" toName="image" perRegion="true" choice="single-radio" showInLine="true">
+      <Choice value="prox:in_front_of"/><Choice value="prox:behind"/><Choice value="prox:under"/>
+      <Choice value="prox:next_to"/><Choice value="prox:far"/><Choice value="prox:no_scaffold_in_image"/>
+    </Choices>
+    <Header value="5. Helmet and harness (required). Harness not_worn ONLY if shoulders and chest are visible with no straps"/>
+    <Choices name="helmet_state" toName="image" perRegion="true" required="true" choice="single-radio" showInLine="true">
+      <Choice value="helmet:worn"/><Choice value="helmet:not_worn"/><Choice value="helmet:held"/><Choice value="helmet:not_visible"/>
+    </Choices>
+    <Choices name="harness_state" toName="image" perRegion="true" required="true" choice="single-radio" showInLine="true">
+      <Choice value="harness:worn"/><Choice value="harness:not_worn"/><Choice value="harness:not_visible"/>
+    </Choices>
+    <Header value="6. Anchor point visible? (only if harness worn; replaces tied_off)"/>
+    <Choices name="anchor_visible" toName="image" perRegion="true" choice="single-radio" showInLine="true">
+      <Choice value="anchor:yes"/><Choice value="anchor:no"/>
+    </Choices>
+    <Header value="Optional (error analysis)"/>
+    <Choices name="height_band" toName="image" perRegion="true" showInLine="true">
+      <Choice value="h:ground"/><Choice value="h:low"/><Choice value="h:mid"/><Choice value="h:top"/><Choice value="h:unknown"/>
+    </Choices>
+    <Choices name="posture" toName="image" perRegion="true" showInLine="true">
+      <Choice value="standing"/><Choice value="climbing_posture"/><Choice value="kneeling"/><Choice value="sitting"/><Choice value="leaning"/>
+    </Choices>
+  </View>
+
+  <!-- Per-image fields. -->
+  <Header value="Image: is EVERY visible person (>= 15 px) boxed or inside an ignore_region? (required)"/>
+  <Choices name="all_people_boxed" toName="image" required="true" choice="single-radio" showInLine="true">
+    <Choice value="boxed:yes"/><Choice value="boxed:no"/>
+  </Choices>
+  <Header value="Image (optional)"/>
+  <Choices name="viewpoint" toName="image" showInLine="true">
+    <Choice value="view:ground"/><Choice value="view:elevated"/><Choice value="view:aerial"/>
+  </Choices>
+  <Choices name="distance" toName="image" showInLine="true">
+    <Choice value="dist:near"/><Choice value="dist:mid"/><Choice value="dist:far"/>
+  </Choices>
+  <Choices name="lighting" toName="image" showInLine="true">
+    <Choice value="light:day"/><Choice value="light:low"/><Choice value="light:night"/><Choice value="light:backlit"/>
+  </Choices>
+  <Choices name="occlusion" toName="image" showInLine="true">
+    <Choice value="occ:none"/><Choice value="occ:partial"/><Choice value="occ:heavy"/>
+  </Choices>
+  <Choices name="image_flag" toName="image" showInLine="true">
+    <Choice value="skip:no_person_no_scaffold"/><Choice value="skip:bad_image"/>
+  </Choices>
+</View>

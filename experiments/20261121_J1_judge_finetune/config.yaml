@@ -1,0 +1,13 @@
+# Study J1_judge_finetune. POST-TEST round (test_v1 already used, r00097): selection and reporting on validation only.
+# Written 2026-11-21 ~20:55 CET BEFORE any run of this study.
+study: "J1_judge_finetune"
+phase: post_test_validation_only
+decision_rule: 08_controlled/decision_rule.md      # same bar: >= +0.05 recall at val FA 1.5% (mean of 5) and paired CI > 0
+question: "Does fine-tuning the crop encoder end-to-end (instead of a logistic regression on a frozen embedding) beat the C1 judge?"
+hypothesis: "The frozen yolo11n-cls ImageNet embedding is weak on cs10k_dev (conditional AP 0.30 vs 0.90 on val_v2). Fine-tuning the whole classifier on C1 crops should raise conditional AP and end-to-end recall by >= 0.05."
+detector: D0 (fixed; same cached detections as D1_detector/D0)
+arms:
+  - {name: J0, change: "none: C1 logistic regression (= D1_detector D0 scores, r00045-r00049)"}
+  - {name: J1, change: "yolo11n-cls (ImageNet weights) fine-tuned on C1 crops of train_v2 labeled people, 2 classes; 8 epochs, AdamW lr 3e-4 (head 3e-3), batch 64, class-balanced CE, aug hflip + colour jitter + random-resized-crop scale 0.8-1; same 5 draws (80% of train_v2 images, seed d); no early stopping (no peeking at val); probability = softmax"}
+  - {name: J2, change: "info: MLP (1 hidden layer 256, dropout 0.3) on the frozen C1 features, same draws"}
+metrics: [recall_at_fa_0.015_end_to_end, recall_at_fa_0.05, conditional AP (val_v2 and cs10k_dev separately)]

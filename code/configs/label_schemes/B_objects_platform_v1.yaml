@@ -1,0 +1,21 @@
+# Scheme B = A + scaffold_platform (+ scaffold_structure kept for reference).
+# A source that boxes the WHOLE scaffold maps to scaffold_structure, never to scaffold_platform.
+# Platforms come from (a) rf_scaffold_platform 'working_platform' and (b) hand labels (polygons) from the queue.
+scheme: B_objects_platform_v1
+version: 1
+extends: A_objects_v1
+classes: [person, helmet, head, harness, scaffold_platform, scaffold_structure]
+reference_only: [scaffold_structure]     # exported, but not a target for the 'on scaffold' rule
+hand_labels: labels/relations/v1/        # platform polygons from Label Studio override/extend sources
+sources:
+  rf_scaffold_platform:
+    map: {working_platform: scaffold_platform, modular_scaffold: scaffold_structure,
+          prefabricated_frame_scaffold: scaffold_structure, tube_and_coupler_scaffold: scaffold_structure}
+    exhaustive: [scaffold_platform, scaffold_structure]
+  rf_harness_mks:      {add_map: {Suspension_scaffold: scaffold_structure}, add_exhaustive: [scaffold_structure]}
+  rf_scaffold_esco:    {add_map: {scaffold: scaffold_structure}, add_exhaustive: [scaffold_structure]}
+  rf_scaffold_hook:    {add_map: {scaffolds: scaffold_structure}, add_exhaustive: [scaffold_structure]}
+  rf_scaffold_sparks:  {add_map: {scaffold: scaffold_structure}, add_exhaustive: [scaffold_structure]}
+  rf_scaffold_climb:   &mob {add_map: {mobile_scaffold_outtrigger: scaffold_structure, mobile_scaffold_no_outtrigger: scaffold_structure}, add_exhaustive: [scaffold_structure]}
+  rf_scaffold_mobile:  *mob
+  rf_scaffold_archikhu: {add_map: {mobile_scaffold_outtrigger: scaffold_structure, mobile_scaffold_no_outtrigger: scaffold_structure, "-scaffold": scaffold_structure}, add_exhaustive: [scaffold_structure]}

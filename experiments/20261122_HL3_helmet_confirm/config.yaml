@@ -1,0 +1,10 @@
+# Study HL3_helmet_confirm. POST-TEST (validation only). Written 2026-11-22 ~00:20 CET before selecting or labeling.
+question: "Second confirmation of the helmet change (C0 + head crop vs C0) with more no-helmet people and person boxes drawn by humans (CS10k's own annotations)."
+pool: "CS10k images not in test_v1, cs10k_dev, train_v2, val_v2, the K1 pseudo-label set or val_extra; not in a dedup cluster with them; pHash Hamming > 10 to every test_v1/cs10k_dev/val_v2 image"
+people:
+  not_worn_candidates: "CS10k rule_1_violation boxes (rule 1 = basic PPE, includes hard hat): Claude labels the helmet state from a zoomed head crop (W/N/V); only N kept as not_worn, W kept as worn"
+  worn: "CS10k worker_with_white_hard_hat boxes (human label = helmet worn), random sample of 2x the number of N people, seed 0"
+  boxes: "human (CS10k) boxes, no detector involved"
+target: ">= 60 not_worn people; stop at 250 violation boxes reviewed"
+metric: "helmet balanced accuracy, 5 draws (same train draws as HL1), cutoff 0.5; paired image bootstrap 2000"
+decision: "confirmed if diff >= +0.05 and CI > 0 (second, independent confirmation after V3_confirm)"

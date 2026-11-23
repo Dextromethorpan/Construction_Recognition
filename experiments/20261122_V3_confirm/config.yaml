@@ -1,0 +1,16 @@
+# Study V3_confirm. POST-TEST (test_v1 used). Written 2026-11-21 23:50 CET BEFORE selecting or labeling any new image.
+# Luciano approved option A (grow the selection set) 2026-11-21 23:37 CET.
+purpose: "Confirm, on NEW unseen photos, the two post-hoc candidates from the post-test round: (1) detector 960 px + conf 0.10 + NMS 0.8 (S1, +0.051 on old val, CI incl 0); (2) helmet head = C0 + head-crop embeddings (HL2, +0.051 on old val, declared info-only)."
+new_set:
+  name: val_extra
+  source: "CS10k images with caption category scaffold_workers (relation_v2/build_splits_v2.cs10k_category)"
+  exclusions: "test_v1, cs10k_dev, train_v2, val_v2, the 2,000 K1 pseudo-label images; dedup cluster mates; pHash Hamming <= 10 to any test_v1 / cs10k_dev / val_v2 image"
+  size: "random order (seed 0); label until >= 200 on-scaffold people or 220 images, whichever first"
+  labels: "Claude only (no second annotator, flagged): person boxes (prefilled from yolo11m conf 0.15 @1280 UNION the D1_960 detector conf 0.05, then Claude adds missed people and deletes non-people), on_scaffold on/not_on/unclear (platform or frame/attached ladder = on), helmet worn/not_worn/not_visible. Guideline = GUIDELINES v2 support_surface + helmet_state."
+  bias_note: "prefill from two detectors may make missed people slightly under-labeled; Claude checks every image for unboxed people"
+primary:
+  detector: "end-to-end on-scaffold recall at FA 1.5%, cutoff chosen on the not_on people of val_extra itself (same rule), mean of the 5 judge draws; arm S = D1_960 conf 0.10 NMS 0.8 vs baseline D0 (yolo11n 512 conf 0.25)"
+  helmet: "helmet balanced accuracy on val_extra labeled people; arm HL2 (C0 + head) vs C0"
+decision: "each candidate is confirmed only if, on val_extra ALONE, mean diff >= +0.05 and paired image-bootstrap 95% CI (2000) > 0. Pooled (old selection + val_extra) reported as secondary. If confirmed: quantize (CoreML INT8) and update the write-up as post-test changes; test is NOT re-run."
+judge_and_heads: "unchanged recipe (C1 logistic judge; logistic heads), trained on train_v2 draws 0-4 only"
+amendment_1: "2026-11-22 00:15 CET, after labeling 8 images (positives were rare: 1 of ~30 people): order changed to the first 8 random images + candidates whose CS10k caption says people are on/climbing a scaffold (regex in val_extra_order build), same seed order. Rationale: power needs on-scaffold people. Selection uses captions only, never model outputs. Full random list kept in val_extra_order_random_v0.txt."

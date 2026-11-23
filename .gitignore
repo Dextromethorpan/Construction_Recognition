@@ -1,0 +1,11 @@
+# virtual environments
+.venv*/
+venv/
+env/
+# python
+__pycache__/
+*.pyc
+# macOS
+.DS_Store
+# demo output
+demo_out/

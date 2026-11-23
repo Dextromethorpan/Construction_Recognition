@@ -1,0 +1,34 @@
+# Scheme C v2 = B + a per-person relation, from human/AI-reviewed labels only (labels/relations/v2/).
+# The labeled fact is support_surface (what the feet stand on). on_scaffold is DERIVED, never labeled.
+# Never filled from geometry, a detector or a VLM (those are compared AGAINST C).
+# v1 (C_relation_v1.yaml) is frozen. Field values live in 02_labeling/relation_v2/v2_fields.py (single source).
+scheme: C_relation_v2
+version: 2
+extends: B_objects_platform_v1
+covers: images in labeling_queue/relation_v2/queue.csv with a finished, reviewed annotation
+guidelines: labeling_queue/relation_v2/GUIDELINES.md (v2.0)
+relation:
+  subject: person
+  object: scaffold_platform          # polygon id, or null
+  labeled_field: support_surface
+  values: [on, not_on, unclear]
+  derived_from_support_surface:
+    scaffold_platform: on
+    scaffold_frame_or_attached_ladder: on
+    ground: not_on
+    other_elevated: not_on
+    unclear: unclear
+  default_when_doubt: unclear
+  missing: unannotated               # four states: on / not_on / unclear / unannotated. Never fill missing with not_on
+backward_map_to_v1_support:          # so v1 and v2 labels can be scored together
+  scaffold_platform: stands_on
+  scaffold_frame_or_attached_ladder: climbing
+  ground: none
+  other_elevated: none
+  unclear: unclear
+hard_negative_type: "support_surface + '+' + proximity  (e.g. ground+in_front_of, other_elevated+next_to)"
+training_policy_default:             # chosen in the v1 ablation (Ablation log §9); a run config may override
+  unclear: drop
+  unannotated: drop
+agreement: {double_labeled_share: 0.15, human_check_people: 50, metric: cohen_kappa, min_kappa_for_target: 0.6,
+            adjudication: "disagreements -> review; unresolved -> unclear"}

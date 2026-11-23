@@ -1,0 +1,126 @@
+0 | 0 O W ; 1 X ; 2 X
+1 | 0 G W ; 1 X
+2 | 0 G W ; 1 G W ; 2 G W
+3 | 1 U W ; 5 U W ; 2 U W ; 4 X ; 3 G V ; add 64,44,4,7 G W
+4 | 0 U W ; 1 G W ; 2 G W ; 14 G W ; 3 G W ; 5 G W ; 6 G W ; 7 G W ; 8 G W ; 9 G V ; 12 G V ; 13 G V ; 10 X ; 11 X
+5 | 0 G V ; 1 G V ; 2 G V
+6 | 0 G W ; add 24,0,19,97 G W
+7 | 0 G W ; 1 X
+8 | 1 O V ; 0 G W ; 2 G W ; 4 G W
+9 | 0 O W ; 1 O W
+10 | 0 G W ; 2 O W ; 5 O W ; 4 G W ; 3 X ; add 45,17,8,12 G W
+11 | 1 O W ; 0 O W ; 3 O V ; 2 G W
+12 | 1 G W ; 0 G W ; 2 X ; 3 X
+13 | 0 O V ; 1 O V
+14 | 0 G V ; 1 X ; 2 X ; 3 X ; 4 X
+15 | 0 O W ; add 5,4,5,9 O W ; add 46,44,4,7 G W
+16 | skip
+17 | 0 O W ; 3 O V ; 2 G W ; 1 G W ; 4 X
+18 | 0 U W
+19 | 0 O W ; 1 O W
+20 | 0 O W ; 1 O V
+21 | 1 O W ; 0 G W
+22 | 0 G W ; 2 G W ; 1 G W
+23 | 1 G W ; 2 G W ; 3 U W ; 5 U W ; 4 G V
+24 | 1 O W ; 3 O W ; 6 O W ; 2 O W ; 0 O W ; 4 O W ; add 79,48,3,7 O W ; add 34,57,4,10 O W ; add 70,84,5,7 O W ; add 42,86,3,6 O V
+25 | add 30,78,6,16 G W ; add 0,89,4,10 G V
+26 | 0 O W ; 1 U W
+27 | 0 G W ; 1 X ; add 69,71,2,4 O V ; add 72,71,2,4 O V
+28 | 0 O V ; 1 O V ; 2 O V ; add 84.5,26,1.5,5 O W ; add 90,26,1.5,5 O V ; add 86,38,1.5,6 O V
+29 | 0 G W ; 1 G W ; 2 G W ; 4 X
+30 | 0 G W ; 1 G V ; 2 X
+31 | 0 O W ; 2 O W ; 3 G W ; 1 G W ; 5 G W ; 6 X ; add 49,44,2,6 O W
+32 | 2 G W ; 5 G W ; 6 G W ; 12 G W ; 3 O W ; 0 O W ; 1 G W ; 4 G W ; 8 G W ; 9 X ; 13 X ; 11 X ; 14 X
+33 | 2 O N ; 0 G V ; 1 G W ; 4 X
+34 | 0 O N ; 1 O N
+35 | 1 U W ; 2 X ; add 49,56,5,4 U W ; add 72,58,2,3 U W
+36 | 0 G V ; 1 G V ; 2 G W ; add 45,60,4,6 G W
+37 | 0 O N ; 3 O N ; 2 O N ; 1 G N
+38 | 5 O W ; 2 O W ; 3 O W ; 6 O V ; 4 O V ; 7 U V ; 0 G W ; 1 G W
+39 | 1 O W ; 0 G W
+40 | 1 O W ; 0 O V ; 2 X ; 3 X
+41 | 0 O W
+42 | 0 U V ; 3 U V ; 4 U V ; 5 U V ; 6 U V ; 2 U V ; 7 X
+43 | 0 G W ; 1 G W ; 4 G W ; 5 G W ; 2 G W ; add 31,0,3,7 G V
+44 | 3 O W ; 5 O W ; 0 O W ; 4 O W ; 1 O W ; 6 O W ; add 33,20,6,12 O W ; add 52,56,4,10 O W
+45 | 7 U W ; 4 U V ; 5 U V ; 12 U V ; 10 U V ; 2 G V ; 8 G V ; 6 G V ; 0 G V ; 1 G V ; 3 G V ; 9 G V
+46 | 0 G W ; 3 G W ; 8 X ; 1 G W ; 5 X ; 6 G W ; 2 G W ; 4 G W ; 7 G W
+47 | 0 G W ; 1 G W ; 2 G W ; 3 G V ; 4 X
+48 | 0 O W ; 3 O W ; 2 O W ; 4 O W ; 1 G V ; add 63,40,3,5 G W
+49 | skip
+50 | 0 O W ; 1 O W ; 2 G W
+51 | skip
+52 | 2 O W ; 0 O W ; 3 X ; 1 G V
+53 | 0 G W ; 2 G W ; 5 G W ; 3 G W ; 1 G W ; 4 G W ; 7 G W ; 8 X ; 9 X
+54 | 1 O W ; 0 O W
+55 | 1 G W ; 2 G W ; 4 G W ; 8 G W ; 7 G W ; 0 G W ; 3 G W ; 6 G W ; 5 O W ; 9 X ; 10 X ; 11 X ; 12 X
+56 | 0 O V
+57 | skip
+58 | 3 O V ; 0 G V ; 4 G V ; 5 G V ; 1 G W ; 2 G W
+59 | 0 G W ; add 29,10,5,20 O V ; add 40,8,5,20 O V
+60 | 0 U W ; 10 U W ; 1 U W ; 3 U W ; 9 U W ; 5 G W ; 4 G W ; 2 G W ; 12 G W ; 11 G W ; 6 G W ; 7 G V
+61 | 0 O W ; 1 O V ; 2 O W ; 3 X ; add 52,90,5,10 O W
+62 | 1 G W ; 3 G W ; 0 G W ; 2 G W ; add 54,0,5,23 O W
+63 | skip
+64 | 2 O W ; 0 O W ; 5 O W ; 1 O W ; 3 O W ; 6 X ; 4 G V
+65 | 0 G W ; 1 G W ; 6 G W ; 2 G W ; 4 G W ; 5 G W ; 8 G W ; 3 G W ; 11 G W ; 13 X ; 15 X ; 12 X ; 14 X
+66 | 0 O W ; 1 O W ; 2 O W ; 4 X ; 3 O V ; add 62,15,4,15 O W ; add 40,29,5,12 O W
+67 | 0 O W ; 1 O W ; 3 X ; 2 X ; 4 X
+68 | 0 O W ; 1 O W ; 3 O W ; 2 X ; 4 X
+69 | 0 O W ; 3 O W ; 6 O W ; 1 O W ; 4 O V ; 5 X
+70 | 0 O W
+71 | 0 O N ; 1 X
+72 | 0 G W ; 2 G W ; 1 G W ; 3 G W ; 5 G W ; 6 X ; 4 X
+73 | 0 O W ; 1 O V
+74 | 0 O W ; 1 O W ; 2 O W ; 3 O W ; 4 X ; 5 X ; 6 X
+75 | 0 O V
+76 | 0 U W ; 1 U W ; 2 G W
+77 | 0 G W ; 1 G W ; 4 G W ; 3 X
+78 | 5 U W ; 4 U W ; 7 U W ; 3 U W ; 2 U W ; 1 U W ; 8 U W ; 6 O W ; 0 G W ; 9 O V
+79 | 0 O W ; 1 O W ; 2 X ; add 59,71,3,18 G W
+80 | 2 G W ; 0 U W ; 1 X
+81 | 1 G W ; 0 G W
+82 | 0 O W ; 1 O W ; 6 O W ; 7 O W ; 2 O W ; 4 O W ; 5 O W ; 3 X ; 8 X ; 9 X ; 10 X
+83 | 0 G V ; 1 G W
+84 | 0 U V
+85 | 1 U V ; 0 U V ; 4 U V ; 2 X ; 3 X ; add 46,12,3,5 G V
+86 | 0 U W ; 1 G W ; 2 U W ; 3 G W ; 4 G W ; 5 G W ; 6 G V ; 7 X ; 8 X
+87 | 2 O W ; 1 X ; 0 G W
+88 | 0 O W ; 1 O W ; 2 O W ; 3 O W ; 4 X ; 5 O W ; 6 X ; add 64,55,5,8 O W
+89 | 0 G W ; 1 G W ; add 61,61,1.5,4 U V ; add 63,61,1.5,4 U V ; add 65.5,61,1.5,4 U V ; add 67.5,61,1.5,4 U V
+90 | 3 O V ; 0 G W ; 1 G W ; 2 G W ; 7 G V ; 8 G V ; 6 G V
+91 | 2 O W ; 1 O W ; 3 O V ; 0 G W ; 4 X
+92 | 0 O W ; 1 O W
+93 | 0 O W ; 1 O W ; 2 G W ; 3 O V ; 4 O V ; 5 X ; 6 X ; 7 X
+94 | 5 O W ; 4 O V ; 3 O W ; 1 O W ; 6 O W ; 2 O W ; 7 O W ; 10 X ; 8 X ; 9 X ; 11 X ; 0 G W
+95 | 0 O W
+96 | 0 O W ; 1 O W ; 2 O W ; 3 O W ; 4 X
+97 | 0 G W ; 3 G W ; 2 G W ; 4 G W ; 5 X ; 6 U W ; 1 U V
+98 | 0 G W ; 1 G N ; 2 G W ; 3 X ; 4 X ; 5 X ; 6 X
+99 | 0 U V ; 1 U W ; 3 U W ; 2 O V
+100 | 0 O W ; 1 O V ; 2 O W ; 3 O W ; add 4,73,4,10 O W
+101 | 1 O W ; 2 O W ; 0 G W ; 3 X
+102 | 0 G W ; 1 X ; 2 X
+103 | 0 X ; add 43.5,64,1.5,5 O V
+104 | 0 O W ; 1 X
+105 | 0 O V
+106 | 0 G W ; 1 G W ; 3 G W ; 2 G W ; 4 G W ; 5 X
+107 | 2 G W ; 1 O W ; 3 O W ; 5 O W ; 8 O V ; 4 G W ; 0 G W ; 6 G W ; 7 X ; 9 X
+108 | 0 O W
+109 | 1 G W ; 5 G W ; 2 G W ; 0 G V ; 3 G V ; 6 G V ; 4 G V ; 8 O W ; 7 U V
+110 | 2 O W ; 6 U V ; 7 U W ; 8 U W ; 0 G W ; 3 G W ; 1 G W ; 15 X ; 4 G W ; 10 G V ; 11 G V ; 5 G V ; 9 G V ; 12 G V ; 13 X ; 14 X
+111 | 0 G N ; 3 G N ; 1 G N ; 2 G N ; 4 G N ; 5 G V ; 6 X ; 7 X
+112 | 0 G N ; 3 G W ; 2 G W ; 1 G W
+113 | 0 G V ; 1 G V ; 2 X
+114 | 0 O N
+115 | 0 U V
+116 | 3 O W ; 0 O W ; 1 O W ; 4 O W ; 2 O W ; 5 O W ; 7 O W ; 6 X ; add 53,57,5,8 O W
+117 | 1 O V ; 0 G W
+118 | 2 O V ; 3 O V ; 1 O V ; 5 O V ; 6 O V ; 7 X ; 4 G V ; 0 G V ; 8 X
+119 | 8 U V ; 6 U V ; 14 U W ; 4 U V ; 7 U V ; 16 X ; 15 X ; 5 G V ; 11 X ; 3 G V ; 1 G W ; 0 G V ; 2 G W ; 13 G V ; 10 X ; 12 X ; 17 X
+120 | 0 O W ; 1 X
+121 | 5 U W ; 3 U W ; 4 U W ; 6 U W ; 1 U W ; 2 X ; 0 O W ; 7 G W
+122 | skip
+123 | 0 O V
+124 | 0 O W ; 4 O W ; 1 O W ; 3 O W ; 2 O W ; 7 O W ; 5 U W ; 6 G W
+125 | 0 G W ; 1 G W ; 3 G W ; 2 O V

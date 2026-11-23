@@ -1,0 +1,48 @@
+# Copy to GenIA-code/experiments/<YYYYMMDD>_<study>/config.yaml and fill BEFORE the first run of the study.
+# Every arm of the study uses this file; only `arms` differs. Its hash goes on every RUNLOG row.
+study: "<study name, e.g. context_C0_C3>"
+created: "<YYYY-MM-DD>"
+decision_rule: 08_controlled/decision_rule.md      # fixed; do not edit after the first run
+question: "<one sentence: what this study decides>"
+
+data:
+  split_version: v2                     # splits/v2 (train_v2, val_v2, cs10k_dev); test_v1 only via the test step
+  label_version: v1                     # v1 (frozen_v1/codex_reviewed.json) or v2 (labels/relations/v2/frozen_v2/...)
+  label_policy: {unclear: drop, unannotated: drop, harness_from: per_person_field, labels_from: codex_reviewed}
+  series: real_only                     # real_only | synthetic_fixed  (never mixed in one comparison)
+  extra_negatives: none                 # none | neg400 (unverified ground-level people; off by default)
+
+detector:                               # fixed for the whole study; detections cached once
+  weights: "<path to step 1b base + V2 fine-tune best.pt>"
+  conf: 0.25
+  imgsz: 640
+  cache: "GenIA-data/runs/controlled/<study>/detections.json"
+
+judge:
+  input: C0                             # C0 crop as today | C1 bigger crop, aspect kept | C2 C0 + support geometry | C3 3x3 spatial pooling
+  encoder: yolo11n-cls.pt (frozen)
+  model: logistic_regression
+  l2: 1.0e-3
+  class_weight: balanced
+  output: probability
+  feature_cache: "GenIA-data/runs/controlled/<study>/features_<input>.npz"
+
+repeats:
+  seeds: [0, 1, 2, 3, 4]
+  subset_draws_grouped_by: image        # image | sequence
+
+threshold:
+  rule: fa_on_val                       # lowest cutoff with FA <= budget on not_on people of val_v2 + cs10k_dev
+  budgets: [0.015, 0.05]                # primary first
+
+metrics:
+  primary: recall_at_fa_0.015_end_to_end
+  also: [recall_at_fa_0.05, conditional_ap_true_boxes, helmet_bal_acc, harness_bal_acc, counts]
+  bootstrap: {resamples: 2000, by: image, rethreshold_inside: true}
+  control: [C1_person_coverage, C2_kappa, C3_class_balance, C4_learning_curve, C5_error_split]
+
+arms:                                   # the one thing the study varies
+  - {name: baseline, change: "none"}
+  # - {name: C2, change: "judge.input = C2"}
+
+compute: {device: mps, where: "local Mac, lid open"}

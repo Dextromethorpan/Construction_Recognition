@@ -1,0 +1,25 @@
+# Violations are COMPUTED from v2 facts (labels describe what is there, not violations). rules.yaml (v1) is frozen.
+version: 2
+derived:
+  on_scaffold: "support_surface in ['scaffold_platform', 'scaffold_frame_or_attached_ladder']"
+  at_height_not_scaffold: "support_surface == 'other_elevated'"
+rules:
+  - id: no_helmet
+    when: "helmet_state == 'not_worn'"
+    severity: high
+  - id: no_harness_on_scaffold
+    when: "on_scaffold and harness_state == 'not_worn'"
+    severity: high
+  - id: no_harness_at_height_other
+    when: "at_height_not_scaffold and harness_state == 'not_worn'"
+    severity: high
+    note: "new in v2: roofs, slabs, lifts, free ladders. Reported separately; CS10k rule 2 covers any structure"
+  - id: not_tied_off_on_scaffold
+    enabled: false
+    reason: "tied_off parked in v2 (kappa ~0, 1 positive). Only anchor_visible is recorded, not a target"
+  - id: needs_review
+    when: "support_surface == 'unclear' or helmet_state == 'not_visible' or harness_state == 'not_visible' or any_required_field_unannotated"
+    severity: info
+cs10k_alignment:
+  rule_1_violation: "no_helmet (CS10k rule 1 is broader: all basic PPE)"
+  rule_2_violation: "no_harness_on_scaffold OR no_harness_at_height_other (CS10k rule 2: >= 3 m without edge protection, any structure)"

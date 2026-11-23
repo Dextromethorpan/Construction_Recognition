@@ -29,7 +29,7 @@ def main():
     syn = {r["global_id"] for r in csv.DictReader(open(D / "labels/relations/v1/synthetic_images.csv"))}
     from ultralytics.utils import YAML
     lic = {d["id"]: d["license"] for d in YAML.load(str(D / "manifest.yaml"))["datasets"]}
-    P = demo.Pipeline(); demo.CUT = P.cut; tiles = []; md = []
+    P = demo.Pipeline(); demo.CUT, demo.BACKEND = P.cut, P.backend; tiles = []; md = []
     for stem, gid, cap, why in PICKS:
         t = imgs[gid]; assert t["set"] == "val_v2" and not t["synthetic"] and gid not in syn and not gid.startswith("cs10k"), gid
         im = Image.open(t["img"]).convert("RGB"); res = P.run(im)

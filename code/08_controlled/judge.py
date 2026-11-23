@@ -18,6 +18,16 @@ import numpy as np, torch
 from PIL import Image
 
 import os
+
+
+def pick_device():
+    """Torch device: GENIA_DEVICE if set, else Apple GPU (mps), else NVIDIA GPU (cuda), else CPU. On a Mac this is mps, as before."""
+    if os.environ.get("GENIA_DEVICE"): return os.environ["GENIA_DEVICE"]
+    if torch.backends.mps.is_available(): return "mps"
+    return "cuda" if torch.cuda.is_available() else "cpu"
+
+
+DEVICE = pick_device()
 HOME = Path.home(); D = Path(os.environ.get("GENIA_DATA", HOME / "GenIA-data")); C = Path(os.environ.get("GENIA_CODE", HOME / "GenIA-code"))
 FROZEN = D / "labels/relations/v2/frozen_v2"
 EMB_W = D / "runs/yolo11n-cls.pt"
@@ -87,7 +97,7 @@ def detections(cfg, imgs):
     from ultralytics import YOLO
     dc = cfg["detector"]; m = YOLO(dc["weights"]); out = {}
     for k, g in enumerate(sorted(imgs)):
-        r = m.predict(imgs[g]["img"], imgsz=dc["imgsz"], conf=dc["conf"], device="mps", verbose=False, max_det=300)[0]
+        r = m.predict(imgs[g]["img"], imgsz=dc["imgsz"], conf=dc["conf"], device=DEVICE, verbose=False, max_det=300)[0]
         W, H = r.orig_shape[1], r.orig_shape[0]
         out[g] = [{"cls": int(c), "conf": round(float(s), 4), "box": [x1 / W * 100, y1 / H * 100, (x2 - x1) / W * 100, (y2 - y1) / H * 100]}
                   for (x1, y1, x2, y2), c, s in zip(r.boxes.xyxy.tolist(), r.boxes.cls.tolist(), r.boxes.conf.tolist())]
@@ -102,11 +112,11 @@ class Encoder:
     """yolo11n-cls, frozen. Returns (256-d global-pooled backbone map = design_B embedding, same map pooled to 3x3)."""
     def __init__(self):
         from ultralytics import YOLO
-        self.net = YOLO(str(EMB_W)).model.model.eval().to("mps")
+        self.net = YOLO(str(EMB_W)).model.model.eval().to(DEVICE)
 
     @torch.no_grad()
     def __call__(self, crops):
-        x = torch.stack([torch.from_numpy(np.asarray(c, dtype=np.float32) / 255.).permute(2, 0, 1) for c in crops]).to("mps")
+        x = torch.stack([torch.from_numpy(np.asarray(c, dtype=np.float32) / 255.).permute(2, 0, 1) for c in crops]).to(DEVICE)
         for layer in self.net[:-1]: x = layer(x)
         emb = x.mean((2, 3))      # = ultralytics embed() for -cls models (global pool of the 256-ch map), as in design_B
         sp = torch.nn.functional.adaptive_avg_pool2d(x.cpu(), 3).flatten(1)   # MPS cannot pool 7x7 -> 3x3

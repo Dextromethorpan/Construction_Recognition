@@ -38,17 +38,36 @@ The deployment build is **CoreML INT8: 2.86 MB, 4.1 ms per photo**.
 | `docs/papers/` | Papers used: construction first, then the more abstract relationship papers |
 | `experiments/` | One folder per study: config written before running, results, verdict. `RUNLOG.csv` has every run |
 | `data/` | Split manifests, checksums, our relation labels (v1, v2), guidelines. No images (label schemes: `code/configs/label_schemes/`) |
-| `demo/` | `demo.py`, saved heads and example outputs for the three cases |
-| `models/` | The detector (CoreML INT8 and PyTorch weights) and the frozen encoder used by the heads |
+| `demo/` | `demo.py`, saved heads, 9 sample photos and example outputs for the three cases |
+| `models/` | The detector (CoreML INT8, ONNX and PyTorch weights) and the frozen encoder used by the heads |
 | `code/` | Data pipeline, labeling tools, training, ablation, controlled runner, quantization |
 | `envs/` | Pinned requirements per virtual environment |
 
 ## Run the demo
+The demo runs on **macOS, Windows and Linux**, on a normal CPU. It picks the detector by itself:
+- **Mac:** the CoreML INT8 detector (the deployment build reported in the test).
+- **Windows / Linux:** the same detector exported to **ONNX** (`models/detector_fp32.onnx`, run by onnxruntime). If onnxruntime is missing, it uses the PyTorch file `models/detector_fp32.pt`.
+
+The helmet, harness and scaffold heads and the encoder are the same files on every system. Nine sample photos are in `demo/samples/`.
+
+**macOS / Linux**
 ```bash
-python -m venv .venv && .venv/bin/pip install -r envs/train-requirements.lock.txt
-.venv/bin/python demo/demo.py path/to/photo_or_folder --out demo_out/
+python3 -m venv .venv
+.venv/bin/pip install -r envs/requirements-demo.txt
+.venv/bin/python demo/demo.py demo/samples --out demo_out
 ```
-Each person gets a box (green = on a scaffold) and a tag with the helmet, harness and scaffold answers and their scores. The CoreML model needs macOS. On other systems, use `models/detector_fp32.pt`.
+On Linux, run `.venv/bin/pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu` first to get the small CPU-only PyTorch.
+
+**Windows (PowerShell)**
+```powershell
+py -3 -m venv .venv
+.venv\Scripts\pip install -r envs\requirements-demo.txt
+.venv\Scripts\python demo\demo.py demo\samples --out demo_out
+```
+
+Each person gets a box (green = on a scaffold) and a tag with the helmet, harness and scaffold answers and their scores. The pictures are saved in `demo_out/`. To force a detector, add `--detector coreml`, `--detector onnx` or `--detector pt`. To run on an NVIDIA GPU or force the CPU, set `GENIA_DEVICE=cuda` or `GENIA_DEVICE=cpu`.
+
+**Same model, small differences.** Windows and Linux use the FP32 detector, the Mac uses its INT8 copy. On the test set the two give the same results (on-scaffold recall 0.517 vs 0.521, see the table above). On a single photo a score can move a little, because the boxes differ by a few pixels.
 
 ## Rebuild the data
 The images are not included. The CS10k test images come from a gated dataset, and the other sources are large. `code/01_data/` downloads, converts, deduplicates and splits them, and `data/` holds the manifests and SHA256 checksums to verify the result. See [docs/01_dataset.md](docs/01_dataset.md).

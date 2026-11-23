@@ -1,0 +1,12 @@
+# Run the demo on Windows, Linux or macOS. A CPU is enough (no GPU needed).
+# Tested on Linux CPU (Python 3.13) and macOS Apple silicon (Python 3.11).
+# On Linux, install the small CPU-only PyTorch first, so pip does not pull the large CUDA build:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+torch>=2.6
+torchvision>=0.21
+ultralytics==8.4.215
+numpy
+pillow
+onnxruntime      # runs models/detector_fp32.onnx; without it, demo.py falls back to models/detector_fp32.pt
+# macOS only, to use the CoreML INT8 detector (the deployment build):
+coremltools==9.0; sys_platform == "darwin"

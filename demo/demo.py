@@ -6,7 +6,9 @@
   -> crop C0 (2x1.5 person)  + geo6 -> helmet / harness logistic heads, "worn" if prob >= 0.5
   encoder: frozen yolo11n-cls (judge.Encoder). Heads: 09_demo/heads_d0.npz (made by fit_heads.py).
 
-  .venv-train/bin/python 09_demo/demo.py IMAGE_OR_FOLDER --out DIR
+  python demo/demo.py IMAGE_OR_FOLDER --out DIR [--detector auto|coreml|onnx|pt]
+Detector backend (--detector auto, the default): CoreML INT8 on a Mac, else ONNX (if onnxruntime is installed), else the
+PyTorch .pt file. The heads and encoder are the same on every system. Torch device: judge.pick_device (mps / cuda / cpu).
 Runs offline: every weight file is local; HF_HUB_OFFLINE / YOLO_OFFLINE are set before ultralytics is imported."""
 import argparse, os, sys, time
 os.environ.setdefault("HF_HUB_OFFLINE", "1"); os.environ.setdefault("YOLO_OFFLINE", "1")
@@ -17,21 +19,46 @@ from PIL import Image, ImageDraw, ImageFont
 HERE = Path(__file__).resolve().parent; REPO = HERE.parent
 sys.path.insert(0, str(REPO / "code" / "08_controlled"))
 import judge                                                    # crops, geo6, Encoder: identical to the tested pipeline
-DET_W = Path(os.environ.get("GENIA_DETECTOR", REPO / "models" / "detector_coreml_int8.mlpackage"))
+DETECTORS = {"coreml": REPO / "models" / "detector_coreml_int8.mlpackage",   # macOS only (the tested deployment build)
+             "onnx": REPO / "models" / "detector_fp32.onnx",                 # Windows / Linux / Mac, needs onnxruntime
+             "pt": REPO / "models" / "detector_fp32.pt"}                     # anywhere PyTorch runs
+LABEL = {"coreml": "yolo11n int8 CoreML CPU", "onnx": "yolo11n fp32 ONNX CPU", "pt": "yolo11n fp32 PyTorch CPU"}
 if (REPO / "models" / "encoder_yolo11n-cls.pt").exists(): judge.EMB_W = REPO / "models" / "encoder_yolo11n-cls.pt"
-FONT = next((f for f in ("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", "/Library/Fonts/Arial Unicode.ttf") if Path(f).exists()), None)
+FONT = next((f for f in ("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", "/Library/Fonts/Arial Unicode.ttf",   # macOS
+                          "C:/Windows/Fonts/seguisym.ttf",                                                         # Windows
+                          "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/dejavu/DejaVuSans.ttf")  # Linux
+             if Path(f).exists()), None)
 EXT = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
 
 
+def has(module):
+    import importlib.util
+    return importlib.util.find_spec(module) is not None
+
+
+def pick_detector(choice="auto"):
+    """auto: CoreML on macOS (if coremltools is installed), else ONNX (if onnxruntime is installed), else .pt.
+    GENIA_DETECTOR=/path/to/weights still overrides everything (as before)."""
+    if os.environ.get("GENIA_DETECTOR"):
+        p = Path(os.environ["GENIA_DETECTOR"]); return p, next((k for k, v in DETECTORS.items() if v.suffix == p.suffix), "pt")
+    if choice == "auto":
+        if sys.platform == "darwin" and has("coremltools") and DETECTORS["coreml"].exists(): choice = "coreml"
+        elif has("onnxruntime") and DETECTORS["onnx"].exists(): choice = "onnx"
+        else: choice = "pt"
+    return DETECTORS[choice], choice
+
+
 class Pipeline:
-    def __init__(self, heads=HERE / "heads_d0.npz"):
+    def __init__(self, heads=HERE / "heads_d0.npz", detector="auto"):
+        global DET_W
+        DET_W, self.backend = pick_detector(detector)
         for p in (DET_W, judge.EMB_W, heads):
             if not Path(p).exists(): sys.exit(f"missing local file {p} (demo does not download anything)")
         from ultralytics import YOLO
         z = np.load(heads); self.h = {t: tuple(z[f"{t}_{k}"] for k in ("mu", "sd", "W", "b")) for t in ("on", "helmet", "harness")}
         self.cut = float(z["on_cut"])
         self.det = YOLO(str(DET_W), task="detect"); self.enc = judge.Encoder()
-        self.run(Image.new("RGB", (640, 480), (120, 120, 120)))     # warm-up: CoreML compile, MPS init (detector + encoder)
+        self.run(Image.new("RGB", (640, 480), (120, 120, 120)))     # warm-up: CoreML compile / ONNX session, MPS init
         for k in range(1, 9): self.enc([Image.new("RGB", (224, 224))] * k)
 
     def prob(self, t, X):
@@ -84,18 +111,22 @@ def draw(im, res, title=None, width=1400):
     yb = im.height + 8
     if title: d.text((10, yb), title, fill=(255, 255, 255), font=fb); yb += fs + 12
     d.text((10, yb), f"{len(res['people'])} people · detector {res['det_ms']:.0f} ms · total {res['total_ms']:.0f} ms "
-                     f"(yolo11n int8 CoreML CPU + yolo11n-cls heads)  ·  green box = on scaffold (cutoff {CUT:.3f})",
+                     f"({LABEL.get(BACKEND, BACKEND)} + yolo11n-cls heads)  ·  green box = on scaffold (cutoff {CUT:.3f})",
            fill=(220, 220, 220), font=f)
     return out
 
 
 def main():
-    global CUT
+    global CUT, BACKEND
     ap = argparse.ArgumentParser(); ap.add_argument("src"); ap.add_argument("--out", required=True)
+    ap.add_argument("--detector", default="auto", choices=("auto", "coreml", "onnx", "pt"),
+                    help="detector file: auto = CoreML on a Mac, else ONNX if onnxruntime is installed, else PyTorch .pt")
     ap.add_argument("--title", default=None, help="optional caption drawn in the footer (single image)")
     a = ap.parse_args(); src = Path(a.src); out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
     files = sorted(p for p in src.iterdir() if p.suffix.lower() in EXT) if src.is_dir() else [src]
-    t = time.perf_counter(); P = Pipeline(); CUT = P.cut; print(f"models loaded + warm-up {1000 * (time.perf_counter() - t):.0f} ms")
+    t = time.perf_counter(); P = Pipeline(detector=a.detector); CUT, BACKEND = P.cut, P.backend
+    print(f"detector: {DET_W.name} ({P.backend}), encoder device: {judge.DEVICE}")
+    print(f"models loaded + warm-up {1000 * (time.perf_counter() - t):.0f} ms")
     for fp in files:
         im = Image.open(fp).convert("RGB"); res = P.run(im)
         draw(im, res, a.title).save(out / (fp.stem + "_demo.png"))
@@ -103,6 +134,6 @@ def main():
               "; ".join(f"H{p['helmet']:.2f} Z{p['harness']:.2f} S{p['on']:.2f}{'*' if p['on_yes'] else ''}" for p in res["people"]))
 
 
-CUT = 0.0
+CUT, BACKEND, DET_W = 0.0, "", None
 if __name__ == "__main__":
     main()
